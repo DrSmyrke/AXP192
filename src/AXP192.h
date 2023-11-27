@@ -103,6 +103,19 @@
 /* Computed ADC */
 #define AXP192_COULOMB_COUNTER          (0xff)
 
+#ifndef setBit
+	#define setBit(reg,bit) reg |= (1<<bit)
+#endif
+#ifndef unsetBit
+	#define unsetBit(reg,bit) reg &= ~(1<<bit)
+#endif
+#ifndef inverBit
+	#define inverBit(reg,bit) reg ^= (1<<bit)
+#endif
+#ifndef checkBit
+	#define checkBit(reg,bit) (reg&(1<<bit))
+#endif
+
 //------------------- STRUCTURES --------------------------
 
 
@@ -128,8 +141,19 @@ public:
 	void send(const uint8_t addr, uint8_t data);
 	void getBatVoltage(float &variable);
 	void getBatCharge(uint8_t &variable);
-	void getLDO2Voltage(uint8_t &variable);
-	void getLDO3Voltage(uint8_t &variable);
+	/**
+	 * @brief  millivoltage LDO2
+	 * @param (uint16_t&) variable
+	 * @return none
+	*/
+	void getLDO2Voltage(uint16_t &variable);
+	/**
+	 * @brief  millivoltage LDO3
+	 * @param (uint16_t&) variable
+	 * @return none
+	*/
+	void getLDO3Voltage(uint16_t &variable);
+	void offLDO2Voltage(void);
 	void offLDO3Voltage(void);
 private:
 	TwoWire* _i2cPort;

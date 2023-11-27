@@ -15,7 +15,7 @@ AXP192::~AXP192()
 //-------------------------------------------------------------
 uint8_t AXP192::read8bit(const uint8_t addr)
 {
-	read( addr, 1 );
+	this->read( addr, 1 );
     return (uint8_t)_i2cPort->read();
 }
 
@@ -24,7 +24,7 @@ uint16_t AXP192::read12Bit(const uint8_t addr)
 {
 	uint16_t val = 0;
 	uint8_t buf[2];
-    read( addr, 2, buf );
+    this->read( addr, 2, buf );
 	val = ((buf[0] << 4) + buf[1]);
 	return val;
 }
@@ -34,7 +34,7 @@ uint16_t AXP192::read13Bit(const uint8_t addr)
 {
 	uint16_t val = 0;
 	uint8_t buf[2];
-    read( addr, 2, buf );
+    this->read( addr, 2, buf );
 	val = ( ( buf[0] << 5 ) + buf[1] );
 	return val;
 }
@@ -81,21 +81,36 @@ void AXP192::getBatCharge(uint8_t &variable)
 }
 
 //-------------------------------------------------------------
-void AXP192::getLDO2Voltage(uint8_t &variable)
+void AXP192::getLDO2Voltage(uint16_t &variable)
 {
 	variable = read8bit( AXP192_LDO23_VOLTAGE ) >> 4;
+	variable *= 100;
+	variable += 1800;
 }
 
 //-------------------------------------------------------------
-void AXP192::getLDO3Voltage(uint8_t &variable)
+void AXP192::getLDO3Voltage(uint16_t &variable)
 {
-	variable = ( read8bit( AXP192_LDO23_VOLTAGE ) << 4 ) >> 4;
+	uint8_t val = read8bit( AXP192_LDO23_VOLTAGE ) << 4;
+	variable = val >> 4;
+	variable *= 100;
+	variable += 1800;
+}
+
+//-------------------------------------------------------------
+void AXP192::offLDO2Voltage(void)
+{
+	uint8_t value = read8bit( AXP192_DCDC13_LDO23_CONTROL );
+	unsetBit( value, 2 );
+	this->send( AXP192_DCDC13_LDO23_CONTROL, value );
 }
 
 //-------------------------------------------------------------
 void AXP192::offLDO3Voltage(void)
 {
-	this->send( AXP192_DCDC13_LDO23_CONTROL );
+	uint8_t value = read8bit( AXP192_DCDC13_LDO23_CONTROL );
+	unsetBit( value, 3 );
+	this->send( AXP192_DCDC13_LDO23_CONTROL, value );
 }
 
 //-------------------------------------------------------------
